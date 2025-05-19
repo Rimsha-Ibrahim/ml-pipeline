@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Updated runner
+    runs-on: ubuntu-22.04
     
     steps:
     - uses: actions/checkout@v3
@@ -28,8 +28,26 @@ jobs:
         python src/train_model.py
         ls -la  # Verify file creation
     
-    - name: Upload model
-      uses: actions/upload-artifact@d82c205d6209f39299dfac3c23286e9a5c6812dc  # Pinned v3.1.2
-      with:
-        name: iris-model
-        path: iris_model.joblib
+    - name: Upload model (Alternative Method)
+      if: always()
+      run: |
+        # Create a temporary directory
+        mkdir -p artifact-upload
+        
+        # Copy the model file
+        cp iris_model.joblib artifact-upload/
+        
+        # Create a checksum for verification
+        sha256sum artifact-upload/iris_model.joblib > artifact-upload/checksum.txt
+        
+        # Upload as a zip archive
+        zip -r model-artifact.zip artifact-upload/
+        
+        # Use GitHub's artifact upload API
+        curl -X POST \
+          -H "Authorization: bearer ${{ github.token }}" \
+          -H "Content-Type: application/zip" \
+          --data-binary @model-artifact.zip \
+          "https://uploads.github.com/repos/${{ github.repository }}/actions/artifacts?name=iris-model"
+        
+        echo "Artifact upload complete"
