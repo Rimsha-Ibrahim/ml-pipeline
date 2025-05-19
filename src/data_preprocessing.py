@@ -5,12 +5,10 @@ import numpy as np
 from .config import RANDOM_STATE, TEST_SIZE
 
 def load_data():
-    """Load Iris dataset"""
     iris = load_iris()
     return iris.data, iris.target
 
 def preprocess_data(X, y):
-    """Split & scale data"""
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE
     )
