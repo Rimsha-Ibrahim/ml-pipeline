@@ -1,15 +1,35 @@
-name: ML Pipeline Debug
+name: ML Pipeline
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-22.04  # Updated runner
+    
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Test artifact upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-file
-          path: README.md  # Using a file we know exists
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v
+    
+    - name: Train model
+      run: |
+        python src/train_model.py
+        ls -la  # Verify file creation
+    
+    - name: Upload model
+      uses: actions/upload-artifact@d82c205d6209f39299dfac3c23286e9a5c6812dc  # Pinned v3.1.2
+      with:
+        name: iris-model
+        path: iris_model.joblib
