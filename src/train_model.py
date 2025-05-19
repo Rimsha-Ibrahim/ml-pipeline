@@ -3,8 +3,10 @@ from .config import MODEL_PATH
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import joblib
-from .config import MODEL_PATH, RANDOM_STATE
-from .data_preprocessing import load_data, preprocess_data
+
+from src.config import MODEL_PATH, RANDOM_STATE
+from src.data_preprocessing import load_data, preprocess_data
+
 
 def train_and_save_model():
     X, y = load_data()
